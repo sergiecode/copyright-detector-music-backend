@@ -1,0 +1,78 @@
+### Copyright Detector Music Backend API Tests
+### Created by Sergie Code - AI Tools for Musicians Series
+
+@baseUrl = https://localhost:7000
+# @baseUrl = http://localhost:5000
+
+### Health Check
+GET {{baseUrl}}/health
+
+### API Status
+GET {{baseUrl}}/api/search/status
+
+### Extract Embeddings (Path-based)
+POST {{baseUrl}}/api/search/extract-embeddings
+Content-Type: application/json
+
+{
+  "audioFilePath": "C:\\music\\test_song.wav",
+  "modelName": "spectrogram"
+}
+
+### Analyze Audio File (Path-based)
+POST {{baseUrl}}/api/search/analyze
+Content-Type: application/json
+
+{
+  "audioFilePath": "C:\\music\\test_song.wav",
+  "modelName": "spectrogram",
+  "topK": 10,
+  "similarityThreshold": 0.8
+}
+
+### Upload and Analyze Audio File
+POST {{baseUrl}}/api/search/upload-and-analyze
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="audioFile"; filename="test_song.wav"
+Content-Type: audio/wav
+
+< C:\music\test_song.wav
+--boundary
+Content-Disposition: form-data; name="modelName"
+
+spectrogram
+--boundary
+Content-Disposition: form-data; name="topK"
+
+10
+--boundary
+Content-Disposition: form-data; name="similarityThreshold"
+
+0.8
+--boundary--
+
+### Test with Different Models
+
+### OpenL3 Model Test
+POST {{baseUrl}}/api/search/analyze
+Content-Type: application/json
+
+{
+  "audioFilePath": "C:\\music\\test_song.wav",
+  "modelName": "openl3",
+  "topK": 5,
+  "similarityThreshold": 0.85
+}
+
+### AudioCLIP Model Test
+POST {{baseUrl}}/api/search/analyze
+Content-Type: application/json
+
+{
+  "audioFilePath": "C:\\music\\test_song.wav",
+  "modelName": "audioclip",
+  "topK": 15,
+  "similarityThreshold": 0.75
+}
