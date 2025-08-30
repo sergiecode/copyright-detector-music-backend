@@ -1,4 +1,5 @@
 using CopyrightDetector.MusicBackend.Services;
+using CopyrightDetector.MusicBackend.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,8 +10,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNamingPolicy = null; // Use PascalCase
     });
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -33,6 +33,9 @@ builder.Services.AddSwaggerGen(c =>
     {
         c.IncludeXmlComments(xmlPath);
     }
+    
+    // Configure file upload support
+    c.OperationFilter<FileUploadOperationFilter>();
 });
 
 // Add custom services
@@ -62,7 +65,6 @@ var app = builder.Build();
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
@@ -92,3 +94,6 @@ logger.LogInformation("🔍 Health check available at: /health");
 logger.LogInformation("🎯 Search API available at: /api/search");
 
 app.Run();
+
+// Make Program class accessible for integration tests
+public partial class Program { }

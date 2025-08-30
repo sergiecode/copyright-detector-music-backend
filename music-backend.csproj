@@ -6,10 +6,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>CopyrightDetector.MusicBackend</RootNamespace>
     <AssemblyName>CopyrightDetector.MusicBackend</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.8.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
@@ -20,6 +21,13 @@
     <Folder Include="src\Services\" />
     <Folder Include="src\Models\" />
     <Folder Include="python\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="tests\**" />
+    <Content Remove="tests\**" />
+    <EmbeddedResource Remove="tests\**" />
+    <None Remove="tests\**" />
   </ItemGroup>
 
 </Project>

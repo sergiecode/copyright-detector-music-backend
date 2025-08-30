@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace CopyrightDetector.MusicBackend.Models;
 
 /// <summary>
@@ -6,9 +8,10 @@ namespace CopyrightDetector.MusicBackend.Models;
 public class AudioUploadRequest
 {
     /// <summary>
-    /// The uploaded audio file
+    /// The uploaded audio file (supported formats: wav, mp3, flac, m4a, ogg)
     /// </summary>
-    public IFormFile AudioFile { get; set; } = null!;
+    [Required]
+    public required IFormFile AudioFile { get; set; }
 
     /// <summary>
     /// Model to use for embedding extraction
@@ -18,11 +21,13 @@ public class AudioUploadRequest
     /// <summary>
     /// Number of similar tracks to return
     /// </summary>
+    [Range(1, 100)]
     public int TopK { get; set; } = 10;
 
     /// <summary>
-    /// Similarity threshold for copyright detection
+    /// Similarity threshold for copyright detection (0.0 to 1.0)
     /// </summary>
+    [Range(0.0, 1.0)]
     public double SimilarityThreshold { get; set; } = 0.8;
 }
 

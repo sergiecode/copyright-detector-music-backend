@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using CopyrightDetector.MusicBackend.Models;
 using CopyrightDetector.MusicBackend.Services;
 using System.Diagnostics;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
 
 namespace CopyrightDetector.MusicBackend.Controllers;
 
@@ -92,33 +94,27 @@ public class SearchController : ControllerBase
     }
 
     /// <summary>
-    /// Upload and analyze an audio file
+    /// Upload and analyze an audio file for copyright detection
     /// </summary>
-    /// <param name="audioFile">Audio file to upload</param>
-    /// <param name="modelName">Model to use for embedding extraction</param>
-    /// <param name="topK">Number of similar tracks to return</param>
-    /// <param name="similarityThreshold">Similarity threshold for copyright detection</param>
+    /// <param name="request">Upload request containing file and analysis parameters</param>
     /// <returns>Complete analysis results</returns>
     [HttpPost("upload-and-analyze")]
     [ProducesResponseType(typeof(AudioUploadResponse), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(500)]
-    public async Task<ActionResult<AudioUploadResponse>> UploadAndAnalyze(
-        [FromForm] IFormFile audioFile,
-        [FromForm] string modelName = "spectrogram",
-        [FromForm] int topK = 10,
-        [FromForm] double similarityThreshold = 0.8)
+    [Consumes("multipart/form-data")]
+    public async Task<ActionResult<AudioUploadResponse>> UploadAndAnalyze([FromForm] AudioUploadRequest request)
     {
         try
         {
-            if (audioFile == null || audioFile.Length == 0)
+            if (request.AudioFile == null || request.AudioFile.Length == 0)
             {
                 return BadRequest("No audio file provided");
             }
 
             // Validate file type
             var allowedExtensions = new[] { ".wav", ".mp3", ".flac", ".m4a", ".ogg" };
-            var fileExtension = Path.GetExtension(audioFile.FileName).ToLowerInvariant();
+            var fileExtension = Path.GetExtension(request.AudioFile.FileName).ToLowerInvariant();
             
             if (!allowedExtensions.Contains(fileExtension))
             {
@@ -127,7 +123,7 @@ public class SearchController : ControllerBase
 
             // Validate file size
             var maxFileSizeMB = _configuration.GetValue<int>("FileUpload:MaxFileSizeMB", 50);
-            if (audioFile.Length > maxFileSizeMB * 1024 * 1024)
+            if (request.AudioFile.Length > maxFileSizeMB * 1024 * 1024)
             {
                 return BadRequest($"File size exceeds {maxFileSizeMB}MB limit");
             }
@@ -143,26 +139,26 @@ public class SearchController : ControllerBase
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                await audioFile.CopyToAsync(stream);
+                await request.AudioFile.CopyToAsync(stream);
             }
 
-            _logger.LogInformation("File uploaded: {FileName} ({FileSize} bytes)", fileName, audioFile.Length);
+            _logger.LogInformation("File uploaded: {FileName} ({FileSize} bytes)", fileName, request.AudioFile.Length);
 
             try
             {
                 // Analyze the uploaded file
                 var (embeddingResult, searchResult) = await _pythonService.AnalyzeAudioAsync(
-                    filePath, modelName, topK, similarityThreshold);
+                    filePath, request.ModelName, request.TopK, request.SimilarityThreshold);
 
                 var response = new AudioUploadResponse
                 {
                     Success = embeddingResult.Success && searchResult.Success,
                     FileInfo = new UploadedFileInfo
                     {
-                        OriginalFilename = audioFile.FileName,
+                        OriginalFilename = request.AudioFile.FileName,
                         SavedFilename = fileName,
-                        FileSizeBytes = audioFile.Length,
-                        ContentType = audioFile.ContentType,
+                        FileSizeBytes = request.AudioFile.Length,
+                        ContentType = request.AudioFile.ContentType,
                         UploadTimestamp = DateTime.UtcNow
                     },
                     EmbeddingResult = embeddingResult,
