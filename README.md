@@ -5,7 +5,6 @@
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/)
 [![Python](https://img.shields.io/badge/Python-3.8+-green.svg)](https://www.python.org/)
 [![FAISS](https://img.shields.io/badge/FAISS-Vector%20Search-orange.svg)](https://github.com/facebookresearch/faiss)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Created by **[Sergie Code](https://github.com/sergiecode)** - Software Engineer & YouTube Programming Educator  
 **🎓 AI Tools for Musicians Series**
@@ -775,12 +774,6 @@ dotnet run
 - Follow RESTful API design principles
 - Write unit tests for new features
 - Update documentation for changes
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
